@@ -1,9 +1,6 @@
-from flask import Flask
-from flask_cors import CORS
+from app.app import create_app
 
-app = Flask(__name__)
-app.config.from_object('config.Config')
-cors = CORS(app, origins='*')
+flask_app = create_app()
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080)
+    flask_app.run(debug=True, port=8080)
