@@ -4,10 +4,6 @@ from flask_cors import CORS
 
 from .shop import shop_bp
 
-#from shop.routes import register_routes
-
-from .shop.routes import register_routes
-
 from .models import create_models
 
 from .db import db
