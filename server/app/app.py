@@ -3,6 +3,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from .shop import shop_bp
+from .auth import auth_bp
 
 from .models import create_models
 
@@ -20,5 +21,6 @@ def create_app():
     create_models(app,db)
 
     app.register_blueprint(shop_bp, url_prefix='/shop')
+    app.register_blueprint(auth_bp, url_prefix='/auth')
 
     return app
