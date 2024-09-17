@@ -1,7 +1,8 @@
 from .db import db
+import uuid
 
 class SKU(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36),default=lambda: str(uuid.uuid4()), unique=True, primary_key=True)
     sku = db.Column(db.String(80), nullable=False)
     produto = db.Column(db.String(320), nullable=False)
     preco_cheio = db.Column(db.Float, nullable=False)
