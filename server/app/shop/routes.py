@@ -12,7 +12,8 @@ from ..db import db
 @shop_bp.route('/', methods=['GET'])
 def get_products():
     products = SKU.query.all()
-    return str(products), 200
+    products_list = [product.as_dict() for product in products]
+    return jsonify(products_list), 200
 
 @shop_bp.route('/fill', methods=['POST'])
 def fill():
