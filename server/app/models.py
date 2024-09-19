@@ -12,6 +12,15 @@ class SKU(db.Model):
     def __repr__(self):
         return f'<SKU {self.produto}>'
     
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'sku': self.sku,
+            'produto': self.produto,
+            'preco_cheio': self.preco_cheio,
+            'preco_descontado': self.preco_descontado
+        }
+    
 
 class User(db.Model):
     id = db.Column(db.String(36),default=lambda: str(uuid.uuid4()), unique=True, primary_key=True)
@@ -22,6 +31,15 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
+    
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'manager': self.manager
+            # 'password' intencionalmente não incluído por questões de segurança
+        }
 
 
 class Sale(db.Model):
@@ -37,6 +55,19 @@ class Sale(db.Model):
 
     def __repr__(self):
         return f'<Sale {self.id}>'
+    
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'is_pending': self.is_pending,
+            'is_cash_payment': self.is_cash_payment,
+            'discount': self.discount,
+            'max_discount': self.max_discount,
+            'shipping': self.shipping,
+            'extra': self.extra,
+            'price': self.price,
+            'products': self.products  
+        }
 
 def create_models(app,db):
     with app.app_context():
