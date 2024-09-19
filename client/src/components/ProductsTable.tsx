@@ -1,23 +1,42 @@
 import * as React from "react";
-import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
-
-const rows: GridRowsProp = [
-    { id: 1, col1: "Hello", col2: "World" },
-    { id: 2, col1: "DataGridPro", col2: "is Awesome" },
-    { id: 3, col1: "MUI", col2: "is Amazing" },
-];
+import { DataGrid, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
+import { StateContext } from "../context/ReactContext";
+import { GRID_DEFAULT_LOCALE_TEXT_PT } from "../utils/dataGridTrad";
 
 const columns: GridColDef[] = [
-    { field: "col1", headerName: "SKU", width: 150 },
-    { field: "col2", headerName: "Produto", width: 150 },
-    { field: "col3", headerName: "Preço cheio", width: 150 },
-    { field: "col4", headerName: "Preço descontado", width: 150 },
+    { field: "sku", headerName: "SKU", flex: 0.3 },
+    { field: "produto", headerName: "Produto", flex: 1 },
+    { field: "preco_cheio", headerName: "Preço cheio", flex: 0.3 },
+    { field: "preco_descontado", headerName: "Preço descontado", flex: 0.3 },
 ];
 
-export default function ProductsTable() {
+type Props = {
+    selecionedProducts: GridRowSelectionModel,
+    setSelecionedProducts: (c : GridRowSelectionModel) => void
+}
+
+export default function ProductsTable({selecionedProducts, setSelecionedProducts} : Props) {
+    const { productList } = React.useContext(StateContext);
+
+    const [rowSelectionModel, setRowSelectionModel] =
+        React.useState<GridRowSelectionModel>(selecionedProducts);
+
+    React.useEffect(() => {
+        setSelecionedProducts(rowSelectionModel)
+    },[rowSelectionModel])
+
     return (
         <div style={{ height: 300, width: "100%" }}>
-            <DataGrid rows={rows} columns={columns} />
+            <DataGrid
+                rows={productList}
+                columns={columns}
+                checkboxSelection
+                onRowSelectionModelChange={(newRowSelectionModel) => {
+                    setRowSelectionModel(newRowSelectionModel);
+                }}
+                rowSelectionModel={rowSelectionModel}
+                localeText={GRID_DEFAULT_LOCALE_TEXT_PT}
+            />
         </div>
     );
 }

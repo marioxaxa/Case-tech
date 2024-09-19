@@ -4,9 +4,15 @@ import HorizontalStepper from "../components/HorizontalStepper";
 import ProductsTable from "../components/ProductsTable";
 import StepperButtons from "../components/StepperButtons";
 import NewSaleForm from "../components/NewSaleForm";
+import { GridRowSelectionModel } from "@mui/x-data-grid";
 
 export default function NewSale() {
     const [currentStep, setCurrentStep] = React.useState(0);
+
+    const [stepComponent, setStepComponent] = React.useState(<></>);
+
+    const [selecionedProducts, setSelecionedProducts] =
+        React.useState<GridRowSelectionModel>([]);
 
     const handleNext = () => {
         setCurrentStep((prevCurrentStep) => prevCurrentStep + 1);
@@ -20,14 +26,15 @@ export default function NewSale() {
         setCurrentStep(0);
     };
 
-    const [stepComponent, setStepComponent] = React.useState(<></>);
-
     const windowByStep = () => {
         switch (currentStep) {
             case 0:
                 setStepComponent(
                     <>
-                        <ProductsTable />
+                        <ProductsTable
+                            selecionedProducts={selecionedProducts}
+                            setSelecionedProducts={setSelecionedProducts}
+                        />
                         <StepperButtons
                             currentStep={currentStep}
                             handleBack={handleBack}
@@ -67,7 +74,10 @@ export default function NewSale() {
             default:
                 setStepComponent(
                     <>
-                        <ProductsTable />
+                        <ProductsTable
+                            selecionedProducts={selecionedProducts}
+                            setSelecionedProducts={setSelecionedProducts}
+                        />
                         <StepperButtons
                             currentStep={currentStep}
                             handleBack={handleBack}
@@ -82,6 +92,7 @@ export default function NewSale() {
 
     React.useEffect(() => {
         windowByStep();
+        console.log(selecionedProducts);
     }, [currentStep]);
 
     return (
