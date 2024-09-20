@@ -1,4 +1,10 @@
-import { Typography, List, ListItem, ListItemText, Stack } from "@mui/material";
+import {
+    Typography,
+    List,
+    ListItem,
+    ListItemText,
+    Stack,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import prodQToProdVector from "../utils/prodQToProdVector";
 import getProductById from "../utils/getProductById";
@@ -43,12 +49,15 @@ export default function NewSaleProductList({ selecionedProducts }: Props) {
     }, [selecionedProducts]);
 
     return (
-        <Stack direction={"column"} flex={1} >
+        <Stack direction={"column"} flex={1}>
             <Typography variant="subtitle1" component="div">
                 Produtos Selecionados
             </Typography>
 
-            <List dense sx={{ maxHeight: 250, overflow: "auto", width:'100%' }}>
+            <List
+                dense
+                sx={{ maxHeight: 250, overflow: "auto", width: "100%" }}
+            >
                 {vectorProdList.map((product) => {
                     return (
                         <ListItem key={"productitemlist" + product.sku}>

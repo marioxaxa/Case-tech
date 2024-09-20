@@ -7,19 +7,20 @@ from .auth import auth_bp
 
 from .models import create_models
 
-from .extensions import db, jwt
+from .extensions import db, jwt, migrate
+
 
 
 def create_app():
     app = Flask(__name__)
 
-    cors = CORS(app, origins='*')
-
     app.config.from_object('config.Config')
 
     db.init_app(app)
     jwt.init_app(app)
+    migrate.init_app(app, db)
 
+    CORS(app, origins='*', methods="*", allow_headers="*")
 
     create_models(app,db)
 

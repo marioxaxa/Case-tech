@@ -55,9 +55,11 @@ class Sale(db.Model):
     discount = db.Column(db.Float, nullable=False)
     max_discount = db.Column(db.Float, nullable=False)
     shipping = db.Column(db.Float, nullable=False)
-    extra = db.Column(db.Float, nullable=False)
+    extra = db.Column(db.Float , nullable=False)
     price = db.Column(db.Float, nullable=False)
     products = db.Column(PickleType, nullable=False)
+    seller = db.Column(db.String(36), nullable=False)
+    is_aproved = db.Column(db.Boolean, nullable=True)
 
     def __repr__(self):
         return f'<Sale {self.id}>'
@@ -72,7 +74,9 @@ class Sale(db.Model):
             'shipping': self.shipping,
             'extra': self.extra,
             'price': self.price,
-            'products': self.products  
+            'products': self.products,
+            'seller': self.seller,
+            'is_aproved': self.is_aproved
         }
 
 def create_models(app,db):

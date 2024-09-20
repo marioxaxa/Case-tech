@@ -6,7 +6,7 @@ type Props = {
     handleNext: () => void;
     handleBack: () => void;
     handleReset: () => void;
-    refButton: React.MutableRefObject<null>
+    refButton: React.MutableRefObject<null>;
 };
 
 const steps = [
@@ -20,32 +20,21 @@ export default function StepperButtons({
     handleNext,
     handleBack,
     handleReset,
-    refButton
+    refButton,
 }: Props) {
-
-    const [buttonComponent, setButtonComponent] = React.useState(<></>)
-
-
+    const [buttonComponent, setButtonComponent] = React.useState(<></>);
 
     const portalButton = () => {
-        if (currentStep == 1) {
-            setButtonComponent(
-                <Box ref={refButton} />
-            );
+        if (currentStep == 0) {
+            setButtonComponent(<Button onClick={handleNext}>Proximo</Button>);
         } else {
-            setButtonComponent(
-                <Button onClick={handleNext}>
-                    {currentStep === steps.length - 1
-                        ? "Finalizar compra"
-                        : "Proximo"}
-                </Button>
-            );
+            setButtonComponent(<Box ref={refButton} />);
         }
     };
 
     React.useEffect(() => {
-        portalButton()
-    },[currentStep])
+        portalButton();
+    }, [currentStep]);
 
     return (
         <>

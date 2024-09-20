@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import MiniDrawer from "../components/MiniDrawer";
 import HorizontalStepper from "../components/HorizontalStepper";
 import ProductsTable from "../components/ProductsTable";
@@ -6,21 +6,9 @@ import StepperButtons from "../components/StepperButtons";
 import NewSaleForm, { InputsT } from "../components/NewSaleForm";
 import { ProductQuantityT } from "../types/ProductQuantityT";
 import NewSaleConfirmation from "../components/NewSaleConfirmation";
-import { redirect } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import SnackBarComponent, { ErrorT } from "../components/SnackBarComponent";
 
 export default function NewSale() {
-    const { auth } = useAuth();
-
-    const loader = async () => {
-        if (!auth.isAuthenticated) {
-            return redirect("/Home");
-        }
-        return null;
-    };
-
-    loader()
-
     const [currentStep, setCurrentStep] = React.useState(0);
 
     const [stepComponent, setStepComponent] = React.useState(<></>);
@@ -46,8 +34,15 @@ export default function NewSale() {
     };
 
     const handleReset = () => {
+        setSelecionedProducts({});
         setCurrentStep(0);
     };
+
+    const [error, setError] = useState<ErrorT>({
+        severity: "",
+        message: "",
+        isOpen: false,
+    });
 
     const windowByStep = () => {
         switch (currentStep) {
@@ -76,6 +71,9 @@ export default function NewSale() {
                     <NewSaleConfirmation
                         selecionedProducts={selecionedProducts}
                         saleData={saleData}
+                        setError={setError}
+                        refButton={nextButtonRef}
+                        handleReset={handleReset}
                     />
                 );
                 break;
@@ -107,6 +105,7 @@ export default function NewSale() {
                         handleReset={handleReset}
                         refButton={nextButtonRef}
                     />
+                    <SnackBarComponent error={error} setError={setError} />
                 </>
             </MiniDrawer>
         </div>
