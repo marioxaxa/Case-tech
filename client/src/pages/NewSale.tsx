@@ -6,8 +6,21 @@ import StepperButtons from "../components/StepperButtons";
 import NewSaleForm, { InputsT } from "../components/NewSaleForm";
 import { ProductQuantityT } from "../types/ProductQuantityT";
 import NewSaleConfirmation from "../components/NewSaleConfirmation";
+import { redirect } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function NewSale() {
+    const { auth } = useAuth();
+
+    const loader = async () => {
+        if (!auth.isAuthenticated) {
+            return redirect("/Home");
+        }
+        return null;
+    };
+
+    loader()
+
     const [currentStep, setCurrentStep] = React.useState(0);
 
     const [stepComponent, setStepComponent] = React.useState(<></>);
@@ -20,7 +33,7 @@ export default function NewSale() {
         discount: 0,
         extra: 0,
         state: "",
-    })
+    });
 
     const nextButtonRef = React.useRef(null);
 

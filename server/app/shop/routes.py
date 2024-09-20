@@ -1,3 +1,4 @@
+from flask_jwt_extended import  jwt_required
 from flask import jsonify, request
 from sqlalchemy.inspection import inspect
 
@@ -16,6 +17,7 @@ def get_products():
     return jsonify(products_list), 200
 
 @shop_bp.route('/fill', methods=['POST'])
+@jwt_required()
 def fill():
     products = fill_db()
     return products, 201
@@ -27,6 +29,7 @@ def get_sales():
     return str(sales), 200
 
 @shop_bp.route('/sale', methods=['POST'])
+@jwt_required()
 def create_sale():
     sale_data = request.get_json()
 
@@ -52,28 +55,24 @@ def create_sale():
     return str(new_sale), 201
 
 @shop_bp.route('/sales/<sale_id>', methods=['PUT'])
+@jwt_required()
 def update_sale(sale_id):
     sale_data = request.get_json()
 
-    # Verificar se os dados foram fornecidos
     if not sale_data:
         return jsonify({"error": "Dados da venda não fornecidos."}), 400
 
-    # Obter a venda existente
     sale = Sale.query.get(sale_id)
     if not sale:
         return jsonify({"error": "Venda não encontrada."}), 404
 
-    # Obter os campos da classe Sale, excluindo 'id'
     mapper = inspect(Sale)
     sale_fields = [column.key for column in mapper.attrs if column.key != 'id']
 
-    # Atualizar os campos fornecidos
     for field in sale_fields:
         if field in sale_data:
             setattr(sale, field, sale_data[field])
 
-    # Salvar as alterações no banco de dados
     try:
         db.session.commit()
         return jsonify({"message": "Venda atualizada com sucesso.", "sale_id": sale.id}), 200
@@ -82,6 +81,7 @@ def update_sale(sale_id):
         return jsonify({"error": f"Ocorreu um erro ao atualizar a venda: {str(e)}"}), 500
     
 @shop_bp.route('/sales/pending', methods=['GET'])
+@jwt_required()
 def pending_sales():
     pending_sales = Sale.query.filter_by(is_pending=True).all()
     
