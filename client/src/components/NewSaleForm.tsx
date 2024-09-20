@@ -5,11 +5,19 @@ import {
     FormControl,
     InputLabel,
     Select,
+    Portal,
+    Button,
 } from "@mui/material";
-import { useState } from "react";
 import estadosSiglas from "../utils/estadosSiglas";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
+import React from "react";
+import getProductById from "../utils/getProductById";
+import { StateContext } from "../context/ReactContext";
+import calcDelivery from "../utils/calcDelivery";
+import calcMaxDiscount from "../utils/calcMaxDiscount";
+import { ProductQuantityT } from "../types/ProductQuantityT";
+import prodQToProdVector from "../utils/prodQToProdVector";
 
 const estados = estadosSiglas();
 
@@ -20,29 +28,76 @@ type InputsT = {
     state: string;
 };
 
-export default function NewSaleForm() {
+type Props = {
+    selecionedProducts: ProductQuantityT;
+    refButton: React.MutableRefObject<null>;
+    handleNext: () => void;
+};
+
+export default function NewSaleForm({
+    selecionedProducts,
+    refButton,
+    handleNext,
+}: Props) {
     const {
         register,
         handleSubmit,
         control,
         formState: { errors },
-    } = useForm<InputsT>({
-        defaultValues: {
-            is_cash_payment: null,
-            discount: null,
-            extra: -1,
-            state: "",
-        },
-    });
+        watch,
+    } = useForm<InputsT>();
 
     const onSubmit: SubmitHandler<InputsT> = (data) => {
-        console.log(data);
+        handleNext();
     };
+
+    const { productList } = React.useContext(StateContext);
+
+    const [maxDiscount, setMaxDiscount] = React.useState(0);
+
+    React.useEffect(() => {
+        const subscription = watch((value, { name, type }) => {
+
+            if (
+                typeof value.extra !== "number" ||
+                typeof value.is_cash_payment !== "number" ||
+                typeof value.state !== "string"
+            ) {
+                return;
+            }
+
+            let product_price = 0;
+            console.log(selecionedProducts);
+            const prodIterable = prodQToProdVector(selecionedProducts);
+
+            for (const id of prodIterable) {
+                const product = getProductById(id.key, productList);
+                if (value.is_cash_payment == 1) {
+                    product_price +=
+                        (product?.preco_descontado ?? 0) * id.data.quantidade;
+                } else {
+                    product_price +=
+                        (product?.preco_cheio ?? 0) * id.data.quantidade;
+                }
+            }
+
+
+            const delivery_price = calcDelivery(value.state);
+
+            const maxDiscountHOLDER = calcMaxDiscount(
+                product_price,
+                delivery_price,
+                value.extra
+            );
+
+            setMaxDiscount(maxDiscountHOLDER);
+        });
+        return () => subscription.unsubscribe();
+    }, [selecionedProducts, watch]);
 
     return (
         <Box
             component="form"
-            onSubmit={handleSubmit(onSubmit)}
             sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -80,27 +135,16 @@ export default function NewSaleForm() {
                 >
                     {estados.map((estado) => {
                         return (
-                            <MenuItem value={estado.estado}>
+                            <MenuItem
+                                key={"MenuItem" + estado.estado}
+                                value={estado.estado}
+                            >
                                 {estado.estado}
                             </MenuItem>
                         );
                     })}
                 </Select>
             </FormControl>
-
-            <TextField
-                label="Desconto"
-                type="number"
-                variant="outlined"
-                helperText={"O desconto máximo é de"}
-                {...register("discount", {
-                    required: "Campo obrigatorio",
-                    min: {
-                        value: 0,
-                        message: "O desconto minimo é 0",
-                    },
-                })}
-            />
 
             <FormControl fullWidth>
                 <InputLabel id="cash-select-label">
@@ -118,6 +162,24 @@ export default function NewSaleForm() {
                     <MenuItem value={1}>Pix ou boleto</MenuItem>
                 </Select>
             </FormControl>
+            <TextField
+                label="Desconto"
+                type="number"
+                variant="outlined"
+                helperText={"O desconto máximo é de " + maxDiscount.toFixed(2)}
+                {...register("discount", {
+                    required: "Campo obrigatorio",
+                    min: {
+                        value: 0,
+                        message: "O desconto minimo é 0",
+                    },
+                })}
+            />
+            <Portal container={() => refButton.current}>
+                <Button type="submit" onClick={handleSubmit(onSubmit)}>
+                    Proximo
+                </Button>
+            </Portal>
             <DevTool control={control} />
         </Box>
     );
