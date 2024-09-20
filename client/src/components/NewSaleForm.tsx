@@ -12,18 +12,17 @@ import estadosSiglas from "../utils/estadosSiglas";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
 import React from "react";
-import getProductById from "../utils/getProductById";
 import { StateContext } from "../context/ReactContext";
 import calcDelivery from "../utils/calcDelivery";
 import calcMaxDiscount from "../utils/calcMaxDiscount";
 import { ProductQuantityT } from "../types/ProductQuantityT";
-import prodQToProdVector from "../utils/prodQToProdVector";
+import calcTotalPrice from "../utils/calcTotalPrice";
 
 const estados = estadosSiglas();
 
-type InputsT = {
-    is_cash_payment: number | null;
-    discount: number | null;
+export type InputsT = {
+    is_cash_payment: number;
+    discount: number;
     extra: number;
     state: string;
 };
@@ -32,12 +31,16 @@ type Props = {
     selecionedProducts: ProductQuantityT;
     refButton: React.MutableRefObject<null>;
     handleNext: () => void;
+    saleData: InputsT;
+    setSaleData: (c: InputsT) => void;
 };
 
 export default function NewSaleForm({
     selecionedProducts,
     refButton,
     handleNext,
+    saleData,
+    setSaleData,
 }: Props) {
     const {
         register,
@@ -45,9 +48,10 @@ export default function NewSaleForm({
         control,
         formState: { errors },
         watch,
-    } = useForm<InputsT>();
+    } = useForm<InputsT>({ defaultValues: saleData });
 
     const onSubmit: SubmitHandler<InputsT> = (data) => {
+        setSaleData(data);
         handleNext();
     };
 
@@ -56,8 +60,7 @@ export default function NewSaleForm({
     const [maxDiscount, setMaxDiscount] = React.useState(0);
 
     React.useEffect(() => {
-        const subscription = watch((value, { name, type }) => {
-
+        const subscription = watch((value) => {
             if (
                 typeof value.extra !== "number" ||
                 typeof value.is_cash_payment !== "number" ||
@@ -66,21 +69,11 @@ export default function NewSaleForm({
                 return;
             }
 
-            let product_price = 0;
-            console.log(selecionedProducts);
-            const prodIterable = prodQToProdVector(selecionedProducts);
-
-            for (const id of prodIterable) {
-                const product = getProductById(id.key, productList);
-                if (value.is_cash_payment == 1) {
-                    product_price +=
-                        (product?.preco_descontado ?? 0) * id.data.quantidade;
-                } else {
-                    product_price +=
-                        (product?.preco_cheio ?? 0) * id.data.quantidade;
-                }
-            }
-
+            const product_price = calcTotalPrice(
+                selecionedProducts,
+                value.is_cash_payment,
+                productList
+            );
 
             const delivery_price = calcDelivery(value.state);
 

@@ -3,8 +3,9 @@ import MiniDrawer from "../components/MiniDrawer";
 import HorizontalStepper from "../components/HorizontalStepper";
 import ProductsTable from "../components/ProductsTable";
 import StepperButtons from "../components/StepperButtons";
-import NewSaleForm from "../components/NewSaleForm";
+import NewSaleForm, { InputsT } from "../components/NewSaleForm";
 import { ProductQuantityT } from "../types/ProductQuantityT";
+import NewSaleConfirmation from "../components/NewSaleConfirmation";
 
 export default function NewSale() {
     const [currentStep, setCurrentStep] = React.useState(0);
@@ -13,6 +14,13 @@ export default function NewSale() {
 
     const [selecionedProducts, setSelecionedProducts] =
         React.useState<ProductQuantityT>({});
+
+    const [saleData, setSaleData] = React.useState<InputsT>({
+        is_cash_payment: 0,
+        discount: 0,
+        extra: 0,
+        state: "",
+    })
 
     const nextButtonRef = React.useRef(null);
 
@@ -45,11 +53,18 @@ export default function NewSale() {
                         selecionedProducts={selecionedProducts}
                         refButton={nextButtonRef}
                         handleNext={handleNext}
+                        saleData={saleData}
+                        setSaleData={setSaleData}
                     />
                 );
                 break;
             case 2:
-                setStepComponent(<>333333333</>);
+                setStepComponent(
+                    <NewSaleConfirmation
+                        selecionedProducts={selecionedProducts}
+                        saleData={saleData}
+                    />
+                );
                 break;
             default:
                 setStepComponent(
@@ -64,7 +79,6 @@ export default function NewSale() {
 
     React.useEffect(() => {
         windowByStep();
-        console.log(selecionedProducts);
     }, [currentStep]);
 
     return (
