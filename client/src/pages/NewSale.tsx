@@ -4,7 +4,7 @@ import HorizontalStepper from "../components/HorizontalStepper";
 import ProductsTable from "../components/ProductsTable";
 import StepperButtons from "../components/StepperButtons";
 import NewSaleForm from "../components/NewSaleForm";
-import { GridRowSelectionModel } from "@mui/x-data-grid";
+import { ProductQuantityT } from "../types/ProductQuantityT";
 
 export default function NewSale() {
     const [currentStep, setCurrentStep] = React.useState(0);
@@ -12,7 +12,9 @@ export default function NewSale() {
     const [stepComponent, setStepComponent] = React.useState(<></>);
 
     const [selecionedProducts, setSelecionedProducts] =
-        React.useState<GridRowSelectionModel>([]);
+        React.useState<ProductQuantityT>({});
+
+    const nextButtonRef = React.useRef(null);
 
     const handleNext = () => {
         setCurrentStep((prevCurrentStep) => prevCurrentStep + 1);
@@ -30,61 +32,31 @@ export default function NewSale() {
         switch (currentStep) {
             case 0:
                 setStepComponent(
-                    <>
-                        <ProductsTable
-                            selecionedProducts={selecionedProducts}
-                            setSelecionedProducts={setSelecionedProducts}
-                        />
-                        <StepperButtons
-                            currentStep={currentStep}
-                            handleBack={handleBack}
-                            handleNext={handleNext}
-                            handleReset={handleReset}
-                        />
-                    </>
+                    <ProductsTable
+                        selecionedProducts={selecionedProducts}
+                        setSelecionedProducts={setSelecionedProducts}
+                    />
                 );
 
                 break;
             case 1:
                 setStepComponent(
-                    <>
-                        <NewSaleForm />
-                        <StepperButtons
-                            currentStep={currentStep}
-                            handleBack={handleBack}
-                            handleNext={handleNext}
-                            handleReset={handleReset}
-                        />
-                    </>
+                    <NewSaleForm
+                        selecionedProducts={selecionedProducts}
+                        refButton={nextButtonRef}
+                        handleNext={handleNext}
+                    />
                 );
                 break;
             case 2:
-                setStepComponent(
-                    <>
-                        333333333
-                        <StepperButtons
-                            currentStep={currentStep}
-                            handleBack={handleBack}
-                            handleNext={handleNext}
-                            handleReset={handleReset}
-                        />
-                    </>
-                );
+                setStepComponent(<>333333333</>);
                 break;
             default:
                 setStepComponent(
-                    <>
-                        <ProductsTable
-                            selecionedProducts={selecionedProducts}
-                            setSelecionedProducts={setSelecionedProducts}
-                        />
-                        <StepperButtons
-                            currentStep={currentStep}
-                            handleBack={handleBack}
-                            handleNext={handleNext}
-                            handleReset={handleReset}
-                        />
-                    </>
+                    <ProductsTable
+                        selecionedProducts={selecionedProducts}
+                        setSelecionedProducts={setSelecionedProducts}
+                    />
                 );
                 break;
         }
@@ -101,6 +73,13 @@ export default function NewSale() {
                 <>
                     <HorizontalStepper currentStep={currentStep} />
                     {stepComponent}
+                    <StepperButtons
+                        currentStep={currentStep}
+                        handleBack={handleBack}
+                        handleNext={handleNext}
+                        handleReset={handleReset}
+                        refButton={nextButtonRef}
+                    />
                 </>
             </MiniDrawer>
         </div>
