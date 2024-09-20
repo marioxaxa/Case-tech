@@ -1,6 +1,7 @@
-from flask import Flask
+from app.app import create_app
+from flask import request, jsonify
 
-app = Flask(__name__)
+flask_app = create_app()
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080)
+    flask_app.run(debug=True, port=8080)
