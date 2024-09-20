@@ -7,7 +7,7 @@ from . import shop_bp
 
 from ..utils.fill_db import fill_db
 
-from ..db import db
+from ..extensions import db
 
 @shop_bp.route('/', methods=['GET'])
 def get_products():

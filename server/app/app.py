@@ -7,7 +7,7 @@ from .auth import auth_bp
 
 from .models import create_models
 
-from .db import db
+from .extensions import db, jwt
 
 
 def create_app():
@@ -16,7 +16,10 @@ def create_app():
     cors = CORS(app, origins='*')
 
     app.config.from_object('config.Config')
+
     db.init_app(app)
+    jwt.init_app(app)
+
 
     create_models(app,db)
 

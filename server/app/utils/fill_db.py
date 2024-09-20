@@ -2,7 +2,7 @@ from ..static import PRODUCTS_DATA
 
 from ..models import SKU
 
-from ..db import db
+from ..extensions import db
 
 def fill_db():
 
